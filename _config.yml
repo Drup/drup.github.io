@@ -1,0 +1,10 @@
+# Site settings
+title: Drup thingies
+email: drup@zoho.com
+baseurl: "" # the subpath of your site, e.g. /blog/
+github_username:  drup
+
+# Build settings
+markdown: kramdown
+highlighter: pygments
+safe: true
