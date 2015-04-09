@@ -2,22 +2,23 @@
 layout: default
 ---
 
-<div class="home">
-
-  <h1 class="page-heading">Posts</h1>
-
-  <ul class="post-list">
-    {% for post in site.posts %}
-      <li>
-        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
-
-        <h2>
-          <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-        </h2>
-      </li>
-    {% endfor %}
-  </ul>
-
-  <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
-
+{% for post in site.posts %}
+<div class="article-wrapper">
+    <article>
+    {% include article-header.html page=post link=true %}
+        <section class="post-content">
+            {% assign excerpt_size = post.excerpt | size %}
+            {% assign content_size = post.content | size %}
+            {% if excerpt_size < content_size %}
+            {{ post.excerpt }}
+            {% else %}
+            {{ post.content }}
+            {% endif %}
+        </section>
+    </article>
 </div>
+
+{% if forloop.last != true %}
+<hr/>
+{% endif %}
+{% endfor %}

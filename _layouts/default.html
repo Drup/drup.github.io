@@ -1,20 +1,129 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    {% capture title %}{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}{% endcapture %}
 
-  {% include head.html %}
+    {% include page-url-resolver.html page=page %}
 
-  <body>
+    {% if page.excerpt %}
+    {% assign description = page.excerpt | strip_html | strip_newlines | truncate: 160 %}
+    {% else %}
+    {% assign description = site.description %}
+    {% endif %}
 
-    {% include header.html %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <div class="page-content">
-      <div class="wrapper">
+    <title>{{ title }}</title>
+
+    <meta name="description" content="{{ description }}">
+
+    <link rel="shortcut icon" href="{{ '/favicon.ico' | prepend: site.baseurl }}" type="image/x-icon">
+    <link rel="canonical" href="{{ url }}">
+    <link rel="alternate" type="application/atom+xml" title="{{ site.title }}" href="{{ '/feed.xml' | prepend: site.baseurl | prepend: site.url }}" />
+    <link rel="alternate" type="application/atom+xml" title="{{ site.title }}-OCaml" href="{{ '/feed-ocaml.xml' | prepend: site.baseurl | prepend: site.url }}" />
+
+    {% if page.eye_catch %}
+    {% assign ogp_image_url = page.eye_catch %}
+    {% else %}
+    {% assign ogp_image_url = site.ogp.image_url %}
+    {% endif %}
+
+    <meta property="og:title" content="{{ title }}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="{{ ogp_image_url }}" />
+    <meta property="og:url" content="{{ url }}" />
+    <meta property="og:site_name" content="{{ site.title }}" />
+    <meta property="og:description" content="{{ description }}" />
+
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic" rel="stylesheet">
+
+    <link href="{{ '/assets/css/style.css' | prepend: site.baseurl }}" rel="stylesheet">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="inner clearfix">
+        {% if site.avatar %}
+        <a href="{{ '/' | prepend: site.baseurl }}">
+            <img class="avatar" src="{{ site.avatar | prepend: site.baseurl }}" alt=""/>
+        </a>
+        {% endif %}
+        <h1 class="clearfix">
+          <a class="title {% if site.avatar == null %}slim{% endif %}" href="{{ '/' | prepend: site.baseurl }}">{{ site.title }}</a>
+          {% if site.description %}
+          <p class="description">{{ site.description }}</p>
+          {% endif %}
+        </h1>
+    </div>
+</header>
+
+<div class="site-container">
+    <div class="site-content">
         {{ content }}
-      </div>
     </div>
 
-    {% include footer.html %}
+    <aside class="site-aside">
+        <div class="inner">
+            <div class="block">
+                <form action="{{ site.baseurl }}/search">
+                    <input type="search" id="search" name="q" placeholder="{{ site.str_search }}" />
+                </form>
+            </div>
+            <ul>
+                {% assign pages = (site.pages | sort: 'order') %}
+                {% for page in pages %}
+                {% if page.title and page.hide != true %}
+                <li><a class="page-link" href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a></li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+            <ul class="icons">
+                {% include icons.html icons=site.icons %}
+            </ul>
+            <hr class="with-no-margin margin-bottom"/>
 
-  </body>
+            <div class="block sticky">
+                <h1>{{ site.str_recent_posts }}</h1>
+                <ul>
+                    {% assign posts = (site.posts | sort: 'date' | reverse) %}
+                    {% for post in posts limit:site.recent_posts_num %}
+                    <li><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </aside>
+</div>
 
+<footer class="site-footer">
+  <div class="inner">
+    <span>
+      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" /></a><br />
+      <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">
+        The content of this blog</span> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.<br />
+      Powered by <a href="http://jekyllrb.com">Jekyll</a> with <a href="https://github.com/qckanemoto/jekyll-qck-theme">QckTheme</a>
+    </span>
+  </div>
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="{{ '/assets/lib/garand-sticky/jquery.sticky.js' | prepend: site.baseurl }}"></script>
+<script src="{{ '/assets/js/script.js' | prepend: site.baseurl }}"></script>
+
+{% if page.id %}
+<script src="{{ '/assets/js/header-link.js' | prepend: site.baseurl }}"></script>
+{% endif %}
+
+{% if page.permalink == '/search/' %}
+<script src="{{ '/assets/js/search.js' | prepend: site.baseurl }}"></script>
+{% endif %}
+
+</body>
 </html>

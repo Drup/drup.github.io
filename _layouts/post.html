@@ -1,15 +1,19 @@
 ---
 layout: default
 ---
-<div class="post">
 
-  <header class="post-header">
-    <h1 class="post-title">{{ page.title }}</h1>
-    <p class="post-meta">{{ page.date | date: "%b %-d, %Y" }}{% if page.author %} • {{ page.author }}{% endif %}{% if page.meta %} • {{ page.meta }}{% endif %}</p>
-  </header>
-
-  <article class="post-content">
-    {{ content }}
-  </article>
-
+<div class="article-wrapper">
+    <article>
+        {% include article-header.html page=page link=false share=page.share %}
+        <section class="post-content">
+            {{ content }}
+        </section>
+        {% include article-footer.html share=page.share eye_catch=true %}
+    </article>
 </div>
+
+{% if site.disqus %}
+<section class="comments">
+    {% include disqus.html %}
+</section>
+{% endif %}

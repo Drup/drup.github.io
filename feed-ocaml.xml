@@ -10,7 +10,7 @@ layout: null
     <link>{{ site.baseurl | prepend: site.url }}/</link>
     <description>{{ site.description | xml_escape }}</description>
     <pubDate>{{ site.time | date_to_rfc822 }}</pubDate>
-    {% for post in site.posts limit:15 %}
+    {% for post in site.tags.OCaml limit:15 %}
       {% include page-url-resolver.html page=post %}
       <item>
         <title>{{ post.title | append: ' | ' | append: site.title | xml_escape }}</title>

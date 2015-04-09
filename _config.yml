@@ -1,10 +1,36 @@
+#given by github pages anyway
+safe: true
+lsi: false
+
 # Site settings
-title: Drup thingies
-email: drup@zoho.com
-baseurl: "" # the subpath of your site, e.g. /blog/
-github_username:  drup
+title: "Drup's thingies"
+baseurl: ""
+url: https://drup.github.io
 
 # Build settings
 markdown: kramdown
 highlighter: pygments
-safe: true
+
+kramdown:
+  input: GFM
+
+avatar: /assets/img/ogp.png
+
+icons:
+  rss: true
+  github: drup
+  email: drupyog<at_thingy>zoho<dot_thingy>com
+
+recent_posts_num: 10
+permalink: none
+excerpt_separator: <!--more-->
+
+sass:
+  sass_dir: _sass
+
+include: ["_pages"]
+
+str_read_more: Read more...
+str_search: Search
+str_recent_posts: Recent posts
+str_show_all_posts: Show all posts
