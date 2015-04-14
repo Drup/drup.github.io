@@ -10,7 +10,7 @@ This was long overdue, after [a lot](https://github.com/ocsigen/ocsigenserver/pu
 
 The first step was obviously to ignore the tutorials and went investigating which little ARM to buy...[^1] Ok, Let's stop browsing ARM stores and actually start the tutorial now.
 
-![It's so cute](https://hackspark.fr/media/catalog/product/cache/1/image/650x/6244465d93851bfb41b9f76e241a8d6d/c/u/cubieboard_top.jpg)
+![An ARM thingy](https://hackspark.fr/media/catalog/product/cache/1/image/650x/6244465d93851bfb41b9f76e241a8d6d/c/u/cubieboard_top.jpg 'It's so cute')
 
 
 The start of the tutorial went rather smoothly. The automagical `mirage configure` command is very magical and I wanted to have a better grasp of how it worked, but I postponed that. I skipped very quickly over the block part (far too low level for me~~) and played with the kv store a bit.
@@ -45,7 +45,7 @@ and tada, you can compose stuffs. It's very elegant, I'm rather fond of it.
 Ok, let's get back to actual mirage programs, instead of mirage configuration, I still have to use the network. Apparently, `tuntap` is not working at all
 on my box (regular archlinux installation). I circled a long time around the issue, and ended up using sockets instead by frustration. I played a bit with the stackv4 example and modified it until it answered everything I was saying through a socket. It was not difficult.
 
-[![Such application](https://i.imgur.com/hRXTGzz.png)](https://i.imgur.com/hRXTGzz.png)
+[![Such application](https://i.imgur.com/hRXTGzz.png 'Such application')](https://i.imgur.com/hRXTGzz.png)
 
 The next step of the tutorial was how to serve a website with mirage, which I was not so interested (I wanted a pause with all this http handling). The one after was about CI and deployment, which is I was already accustomed with. Apparently, there are no other entry-level tutorials, which is a bit unsatisfying. I suppose most people are interested in how to build webservers, but I wanted to do domotics and pilot my music from my kitchen with an ARM little thingy (my avatar is an octopus, yes, I know).
 
