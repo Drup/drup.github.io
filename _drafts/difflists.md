@@ -2,13 +2,13 @@
 title: "Typing Tricks: Diff lists"
 layout: post
 author: "Drup"
-tags: OCaml gadt typing-tricks existential-overflow
+tags: OCaml gadt typing-tricks existential-overflow-crisis
 ---
 
 The diff list trick is a way to compute with lists in types. It allows to create heterogeneous lists which is very useful, in particular in the `Format` module from the standard library.
 <!--more-->
 
-There are mostly two approaches when you want to put things of different types in a list: hide all the types or manage (somehow) to show all the types.
+There are mostly two approaches when we want to put things of different types in a list: hide all the types or manage (somehow) to show all the types.
 
 To hide all the types, nothing easier, we just use an existential:
 {% highlight ocaml %}
@@ -17,7 +17,7 @@ type ex_list =
   | Cons : 'a * ex_list -> ex_list (** 'a is hidden! *)
 {% endhighlight %}
 
-But if you try to write the `get` function that returns the first element (in an option):
+But if we try to write the `get` function that returns the first element (in an option):
 {% highlight ocaml %}
 let get = function
   | Nil -> None
@@ -31,8 +31,7 @@ Error: This expression has type $Cons_'a
        The type constructor $Cons_'a would escape its scope
 {% endhighlight %}
 
-In typechecker language, this means "You are trying to export typing information that you don't have", the type information is trying to escape!
-And he is right: We have no information about the type of what's inside the list at all: it's always `ex_list`, the `'a` is hidden.
+In typechecker language, this means "You are trying to export typing information that you don't have", the type information is trying to escape! We have no information about the type of what's inside the list at all: it's always `ex_list`, the `'a` is hidden.
 
 This way of making heterogeneous lists will works if either:
 - We never need to get out elements.
@@ -51,7 +50,7 @@ A prolog tutorial is available [here](http://homepages.inf.ed.ac.uk/pbrna/prolog
 
 [prolog]: https://en.wikipedia.org/wiki/Prolog
 
-The idea is the following, if you consider the function `(fun x -> 1 :: 2 :: x)`. Concatenating at the end of the list is very cheap (It's O(1)). If we keep a handle that points to the end of the list, we can substitute it by whatever we want. In Prolog, the handle is a unification variable. In the [dlist][] implementation, it's a function parameter.
+The idea is the following, if we consider the function `(fun x -> 1 :: 2 :: x)`, concatenating at the end of the list is very cheap (It's O(1)). If we keep a handle that points to the end of the list, we can substitute it by whatever we want. In Prolog, the handle is a unification variable. In the [dlist][] implementation, it's a function parameter.
 
 I encourage people to read the the Prolog tutorial above, Prolog is a very fun language. It uses a quite different paradigm than OCaml, which is always very enlightening.
 
@@ -68,14 +67,11 @@ Unification is available at the value level in prolog, but it's also available f
 - : int list -> int list = <fun>
 {% endhighlight %}
 
-During type checking, the type checker unifies the unification variable `'a` with `int`
-(As specified by the [Hidley-milner][HM] family of type systems).
-We will now use this to do simple computations.
+During type checking, the type checker unifies the unification variable `'a` with `int` (as specified by the [Hidley-milner][HM] family of type systems). We will now use this to do simple computations.
 
 [HM]: https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system
 
-Let us create our list type. It has two type variables, one for the content of the list and one for the unification variable at the end.
-In the following, I will note `'ty` the **ty**pe of the content and `'v` the unification **v**ariable.
+Let us create our list type. It has two type variables, one for the content of the list and one for the unification variable at the end. In the following, I will note `'ty` the **ty**pe of the content and `'v` the unification **v**ariable.
 
 - An empty list is a list where there is no content: `'ty = 'v`
 - A cons is a list where we added one element to the type.
@@ -146,14 +142,14 @@ let rec append
   | Cons (h, t) -> Cons (h, append t l2)
 {% endhighlight %}
 
-You can write many more functions, but writing them can be quite tricky at the time. The complete code is available in [this gist][diffgist] or [this toplevel][difftop].
+We can write many more functions, but writing them can be quite tricky at the time. The complete code is available in [this gist][diffgist] or [this toplevel][difftop].
 
 [diffgist]: https://gist.github.com/Drup/f8e1564c41374bf38e2cb74dfb0c857a#file-difflist-ml
 [difftop]: https://is.gd/JoZEA1
 
 # Applications
 
-I promised in the intro that all this was actually useful and not just terrible type spaghetti. We will now build a small format-like data type equipped with a `printf`-like function.
+I promised in the introduction that all this was actually useful and not just terrible type spaghetti. We will now build a small format-like data type equipped with a `printf`-like function.
 
 What is, fundamentally, a format ?
 It can be composed of:
@@ -186,19 +182,16 @@ There are two things of note here:
 val myfmt : (string -> string -> 'v, 'v) format
 {% endhighlight %}
 
-This is the type we wanted! Now that we have a format type, we need to build up a `printf` function. What should be the type of `printf myfmt` ?
-It has two holes to fill by strings and it should return a string, so the type should be `string -> string -> string`.
-Since the type of `myfmt` is `(string -> string -> 'v,`v) t`, we can use unification again.
+This is the type we wanted! Now that we have a format type, we need to build up a `printf` function. What should be the type of `printf myfmt`? It has two holes to fill by strings and it should return a string, so the type should be `string -> string -> string`. Since the type of `myfmt` is `(string -> string -> 'v,`v) t`, we can use unification again.
 
 We would have the following type:
-
 {% highlight ocaml %}
 val printf : ('ty, string) t -> 'ty
 {% endhighlight %}
 
 Let's check that it works, if we give `myfmt` to `printf`, `'ty` unifies with `string -> string -> 'v`, `'v` unifies with `string`, so `printf myfmt` is of type `string -> string -> tring`. Fabulous.
 
-In order to implement `printf`, we first need to implement the version by continuation which takes as argument a function consuming the resulting string. `kfprintf f myfmt ...` is morally equivalent to `f (printf myfmt ...)`. However, since you can't manipulate a variable number of arguments in OCaml, we can't write the dots `...`. The solution is to always place the variable number of arguments at the end and to use continuations.
+In order to implement `printf`, we first need to implement the version by continuation which takes as argument a function consuming the resulting string. `kfprintf f myfmt ...` is morally equivalent to `f (printf myfmt ...)`. However, since we can't manipulate a variable number of arguments in OCaml, we can't write the dots `...`. The solution is to always place the variable number of arguments at the end and to use continuations.
 
 {% highlight ocaml %}
 val kprintf : (string -> 'v) -> ('ty, 'v) format -> 'ty
@@ -224,19 +217,20 @@ let rec kprintf
       in f
 {% endhighlight %}
 
-And that's it! You can see the complete code for miniformat in [this gist][miniformat] or in [this toplevel][miniformat.js].
+And that's it! The complete code for miniformat is available in [this gist][miniformat] or in [this toplevel][miniformat.js].
+
 [miniformat]: https://gist.github.com/Drup/f8e1564c41374bf38e2cb74dfb0c857a#file-miniformat-ml
 [miniformat.js]: https://is.gd/Zy5tk2
 
 # Because we can never have nice things
 
-The people that are very familiar with type shenanigans might have noticed that something is fishy[^3]. The issue here is that our type is not covariant in any of it's type variables. There are various reasons for that, but mostly, [mixing subtyping and GADT is tricky][GADTvariance]. This means we don't benefit from the [relaxed value restriction][RWOvalrestr].
+People that are very familiar with type tricks might have noticed that something is fishy[^3]. The issue here is that our type is not covariant in any of it's type variables. There are various reasons for that, but mostly, [mixing subtyping and GADT is tricky][GADTvariance]. This means we don't benefit from the [relaxed value restriction][RWOvalrestr].
 
 [^3]: Or, as one of my teacher used to say, there is a whale under the gravel.
 [GADTvariance]: http://arxiv.org/abs/1301.2903
-[RWOvalretr]: https://realworldocaml.org/v1/en/html/imperative-programming-1.html#the-value-restriction
+[RWOvalrestr]: https://realworldocaml.org/v1/en/html/imperative-programming-1.html#the-value-restriction
 
-In practice, this means we can't use our lists in a functional manner when using append. Using the difference list defined at the beginning:
+In practice, we can't use our lists in a functional manner when using append. Using the difference list defined at the beginning:
 
 {% highlight ocaml %}
 let l = append l1 l2
@@ -249,9 +243,10 @@ This is a severe restriction to the usability of difference lists. `Format` is e
 # Conclusion
 
 We have learned how to (ab)use the type system to create heterogeneous lists that count the number of their elements, and how to use it to create a toy implementation of format. As the other Camlien Gabriel would put it, We know have to learn how not to use this.
-Fortunately, code that manipulate difference lists is quite annoying to write, offering a natural deterrent to apprentice type magicians.
 
-In the case this could actually be useful (such as my own unreleased [Furl][] library), I would encourage to hide the datatypes and provide combinators, as long as examples and documentations. This is a case where the type really do not help understand the API.
+Fortunately, code that manipulate difference lists is quite annoying to write, offering a natural deterrent to apprentice type magicians. In the case this could actually be useful (such as my own unreleased [Furl][] library), I would encourage to hide the datatypes and provide combinators, as long as examples and documentations. This is a case where the type really do not help understand the API.
+
+[Furl]: https://github.com/drup/furl
 
 # Afterwords
 
@@ -268,8 +263,7 @@ let myformat = CamlinternalFormatBasics.(
    ,"%s | %s"))
 {% endhighlight %}
 
-This is very similar to our "miniformat" example, except more complicated[^2]. `String_literal` is `Constant` and `String` is `Hole`.
-It gives us the type `(string -> string -> 'a, 'b, 'a) format`, which is also what we would expect.
+This is very similar to our "miniformat" example, except more complicated[^2]. `String_literal` is `Constant` and `String` is `Hole`. It gives us the type `(string -> string -> 'a, 'b, 'a) format`, which is also what we would expect.
 
 Note the very scary `CamlinternalFormatBasics`, showing that you should probably not use that in your programs.
 
@@ -282,7 +276,7 @@ foo | bar
 
 ## A more convenient syntax for diff lists
 
-With the last version of OCaml, we can rebind `[]` and `::`, making this much ~~more terrible~~ better!
+With the last version of OCaml, we can rebind `[]` and `::`, making this much better!
 
 {% highlight ocaml %}
 module M = struct
