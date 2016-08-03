@@ -36,7 +36,7 @@ Error: This expression has type $Cons_'a
 
 In typechecker language, this means "You are trying to export typing information that you don't have", the type information is trying to escape! We have no information about the type of what's inside the list at all: it's always `ex_list`, the `'a` is hidden.
 
-This way of making heterogeneous lists will works if either:
+This way of making heterogeneous lists will work if either:
 
 - We never need to get out elements.
 - We have more information about what can be put inside (using type witnesses, for example).
@@ -75,7 +75,7 @@ During type checking, the type checker unifies the unification variable `'a` wit
 
 [HM]: https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system
 
-Let us create our list type. It has two type variables, one for the content of the list and one for the unification variable at the end. In the following, I will note `'ty` the **ty**pe of the content and `'v` the unification **v**ariable.
+Let us create our list type. It has two type variables, one for the content of the list and one for the unification variable at the end. In the following, I will note `'ty` the **ty**pe of the content and `'v` is the unification **v**ariable.
 
 - An empty list is a list where there is no content: `'ty = 'v`
 - A cons is a list where we added one element to the type.
@@ -86,7 +86,7 @@ type ('ty,'v) t =
   | Cons : 'a * ('ty, 'v) t -> ('a -> 'ty, 'v) t
 ```
 
-If we consider the type of the cons function, we can see it's equivalent to adding one to the type. We count with arrows.
+If we consider the type of the `Cons` constructor, we can see it's equivalent to adding one to the type. We count with arrows.
 
 ```ocaml
 # let plus1 l = Cons ((),l)
@@ -246,9 +246,9 @@ This is a severe restriction to the usability of difference lists. `Format` is e
 
 # Conclusion
 
-We have learned how to (ab)use the type system to create heterogeneous lists that count the number of their elements, and how to use it to create a toy implementation of format. As the other Camlien Gabriel would put it, We now have to learn how not to use this.
+We have learned how to (ab)use the type system to create heterogeneous lists that tracks the number and the type of their elements, and how to use it to create a toy implementation of format. As the other Camlien Gabriel would put it, We now have to learn how not to use this.
 
-Fortunately, code that manipulate difference lists is quite annoying to write, offering a natural deterrent to apprentice type magicians. In the case this could actually be useful (such as my own unreleased [Furl][] library), I would encourage to hide the datatypes and provide combinators, as long as examples and documentations. This is a case where types really do not help understand the API.
+Fortunately, code that manipulate difference lists is quite annoying to write, offering a natural deterrent to apprentice type magicians. In the case this could actually be useful (such as my own unreleased [Furl][] library), I would encourage to hide the datatypes and provide combinators, along with examples and documentation. This is a case where types really do not help understand the API.
 
 [Furl]: https://github.com/drup/furl
 
@@ -256,7 +256,7 @@ Fortunately, code that manipulate difference lists is quite annoying to write, o
 
 ## Is this really how format works?
 
-Yes, it is, since the awesome work by Benoit Vaugon in OCaml 4.02. As a proof, let's build the format by hand, without using the fancy syntax.
+Yes, it is, since the awesome work by Benoit Vaugon in OCaml 4.02. As proof, let's build the format by hand, without using the fancy syntax.
 
 ```ocaml
 let myformat = CamlinternalFormatBasics.(
@@ -278,7 +278,7 @@ foo | bar
 
 ## A more convenient syntax for diff lists
 
-With the last version of OCaml, we can rebind `[]` and `::`, making this much better!
+With OCaml 4.03.0, we can rebind `[]` and `::`, making this much better!
 
 ```ocaml
 module M = struct
