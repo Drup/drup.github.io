@@ -2,6 +2,7 @@
 title: First steps in mirage
 layout: post
 author: "Drup"
+hide: yes
 tags: OCaml Mirage braindump functor-stack-oriented-development
 ---
 
