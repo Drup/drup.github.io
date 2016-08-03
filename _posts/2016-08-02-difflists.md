@@ -56,7 +56,7 @@ A prolog tutorial is available [here](http://homepages.inf.ed.ac.uk/pbrna/prolog
 
 The idea is the following, if we consider the function `(fun x -> 1 :: 2 :: x)`, concatenating at the end of the list is very cheap (It's O(1)). If we keep a handle that points to the end of the list, we can substitute it by whatever we want. In Prolog, the handle is a unification variable. In the [dlist][] implementation, it's a function parameter.
 
-I encourage people to read the the Prolog tutorial above, Prolog is a very fun language. It uses a quite different paradigm than OCaml, which is always very enlightening.
+I encourage people to read the Prolog tutorial above, Prolog is a very fun language. It uses a quite different paradigm than OCaml, which is always very enlightening.
 
 ## Back to OCaml
 
