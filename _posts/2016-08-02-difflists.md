@@ -97,9 +97,7 @@ If we consider the return type of `one`, `('a -> 'v, 'v) t` we can wander in the
     'ty = 'a -> 'v
     'ty - 'v = 'a
 
-Or, phrased in English: "If we remove `'v` from `'ty`, we get the content". Of course, this arithmetic doesn't make the slightest sense[^1], but it can give a good intuition.
-
-[^1]: Even if we consider [the algebra of types](https://chris-taylor.github.io/blog/2013/02/10/the-algebra-of-algebraic-data-types/)
+Or, phrased in English: "If we remove `'v` from `'ty`, we get the content". Of course, this arithmetic doesn't make the slightest sense (even if we consider [the algebra of types](https://chris-taylor.github.io/blog/2013/02/10/the-algebra-of-algebraic-data-types/)), but it can give a good intuition.
 
 {% highlight ocaml %}
 # let l1 = Cons (1, Cons ("bla", Nil)) ;;
@@ -224,9 +222,8 @@ And that's it! The complete code for miniformat is available in [this gist][mini
 
 # Because we can never have nice things
 
-People that are very familiar with type tricks might have noticed that something is fishy[^3]. The issue here is that our type is not covariant in any of it's type variables. There are various reasons for that, but mostly, [mixing subtyping and GADT is tricky][GADTvariance]. This means we don't benefit from the [relaxed value restriction][RWOvalrestr].
+People that are very familiar with type tricks might have noticed that something is fishy. The issue here is that our type is not covariant in any of it's type variables. There are various reasons for that, but mostly, [mixing subtyping and GADT is tricky][GADTvariance]. This means we don't benefit from the [relaxed value restriction][RWOvalrestr].
 
-[^3]: Or, as one of my teacher used to say, there is a whale under the gravel.
 [GADTvariance]: http://arxiv.org/abs/1301.2903
 [RWOvalrestr]: https://realworldocaml.org/v1/en/html/imperative-programming-1.html#the-value-restriction
 
@@ -263,11 +260,9 @@ let myformat = CamlinternalFormatBasics.(
    ,"%s | %s"))
 ```
 
-This is very similar to our "miniformat" example, except more complicated[^2]. `String_literal` is `Constant` and `String` is `Hole`. It gives us the type `(string -> string -> 'a, 'b, 'a) format`, which is also what we would expect.
+This is very similar to our "miniformat" example, except more complicated. `String_literal` is `Constant` and `String` is `Hole`. It gives us the type `(string -> string -> 'a, 'b, 'a) format`, which is also what we would expect.
 
 Note the very scary `CamlinternalFormatBasics`, showing that you should probably not use that in your programs.
-
-[^2]: Because everything about format is more complicated.
 
 {% highlight ocaml %}
 # Format.printf myformat "foo" "bar" ;;
