@@ -11,29 +11,33 @@ The diff list trick is a way to compute with lists in types. It allows to create
 There are mostly two approaches when we want to put things of different types in a list: hide all the types or manage (somehow) to show all the types.
 
 To hide all the types, nothing easier, we just use an existential:
-{% highlight ocaml %}
+
+```ocaml
 type ex_list =
   | Nil : ex_list
   | Cons : 'a * ex_list -> ex_list (** 'a is hidden! *)
-{% endhighlight %}
+```
 
 But if we try to write the `get` function that returns the first element (in an option):
-{% highlight ocaml %}
+
+```ocaml
 let get = function
   | Nil -> None
   | Cons (x,_) -> Some x
-{% endhighlight %}
+```
 
 The typechecker answers this:
-{% highlight ocaml %}
+
+```ocaml
 Error: This expression has type $Cons_'a
        but an expression was expected of type 'a
        The type constructor $Cons_'a would escape its scope
-{% endhighlight %}
+```
 
 In typechecker language, this means "You are trying to export typing information that you don't have", the type information is trying to escape! We have no information about the type of what's inside the list at all: it's always `ex_list`, the `'a` is hidden.
 
 This way of making heterogeneous lists will works if either:
+
 - We never need to get out elements.
 - We have more information about what can be put inside (using type witnesses, for example).
 
@@ -58,14 +62,14 @@ I encourage people to read the the Prolog tutorial above, Prolog is a very fun l
 
 Unification is available at the value level in prolog, but it's also available for OCaml types! This is how polymorphic function become specialized:
 
-{% highlight ocaml %}
+```ocaml
 # List.map ;;
 - : ('a -> 'b) -> 'a list -> 'b list = <fun>
 # (fun x -> x + 1) ;;
 - : int -> int = <fun>
 # List.map (fun x -> x + 1) ;;
 - : int list -> int list = <fun>
-{% endhighlight %}
+```
 
 During type checking, the type checker unifies the unification variable `'a` with `int` (as specified by the [Hidley-milner][HM] family of type systems). We will now use this to do simple computations.
 
@@ -76,21 +80,21 @@ Let us create our list type. It has two type variables, one for the content of t
 - An empty list is a list where there is no content: `'ty = 'v`
 - A cons is a list where we added one element to the type.
 
-{% highlight ocaml %}
+```ocaml
 type ('ty,'v) t =
   | Nil : ('v, 'v) t
   | Cons : 'a * ('ty, 'v) t -> ('a -> 'ty, 'v) t
-{% endhighlight %}
+```
 
 If we consider the type of the cons function, we can see it's equivalent to adding one to the type. We count with arrows.
 
-{% highlight ocaml %}
+```ocaml
 # let plus1 l = Cons ((),l)
 val plus1 : ('ty, 'v) t -> (unit -> 'ty, 'v) t = <fun>
 
 # let one x = Cons (x, Nil)
 val one : 'a -> ('a -> 'v, 'v) t = <fun>
-{% endhighlight %}
+```
 
 If we consider the return type of `one`, `('a -> 'v, 'v) t` we can wander in the territory of terrible arithmetic and do the following
 
@@ -99,27 +103,27 @@ If we consider the return type of `one`, `('a -> 'v, 'v) t` we can wander in the
 
 Or, phrased in English: "If we remove `'v` from `'ty`, we get the content". Of course, this arithmetic doesn't make the slightest sense (even if we consider [the algebra of types](https://chris-taylor.github.io/blog/2013/02/10/the-algebra-of-algebraic-data-types/)), but it can give a good intuition.
 
-{% highlight ocaml %}
+```ocaml
 # let l1 = Cons (1, Cons ("bla", Nil)) ;;
 val l1 : (int -> string -> 'v1, 'v1) t
 # let l2 = Cons ((), Cons (2., Nil)) ;;
 val l2 : (unit -> float -> 'v2, 'v2) t
-{% endhighlight %}
+```
 
 What should be the type of `append l1 l2` ?
 
-{% highlight ocaml %}
+```ocaml
 # let l3 = Cons (1, Cons ("bla", Cons ((), Cons(2.,Nil))))
 val l3 : (int -> bytes -> unit -> float -> 'v3, 'v3) t
-{% endhighlight %}
+```
 
 We can take the type `'ty1 = int -> string -> 'v1` and replace `'v1` by `'ty2 = unit -> float -> 'v2`. It would also gives us `'v2 = 'v3`.
 
 We can deduce the type of `append`
 
-{% highlight ocaml %}
+```ocaml
 val append : ('ty1, 'ty2) t -> ('ty2, 'v) t -> ('ty1, 'v) t
-{% endhighlight %}
+```
 
 If we try to do terrible arithmetic again:
 
@@ -129,7 +133,8 @@ If we try to do terrible arithmetic again:
       'ty1 - 'v
 
 Writing append is now completely straightforward:
-{% highlight ocaml %}
+
+```ocaml
 let rec append
   : type ty1 ty2 v.
     (ty1, ty2) t ->
@@ -138,7 +143,7 @@ let rec append
   = fun l1 l2 -> match l1 with
   | Nil -> l2
   | Cons (h, t) -> Cons (h, append t l2)
-{% endhighlight %}
+```
 
 We can write many more functions, but writing them can be quite tricky at the time. The complete code is available in [this gist][diffgist] or [this toplevel][difftop].
 
@@ -149,61 +154,63 @@ We can write many more functions, but writing them can be quite tricky at the ti
 
 I promised in the introduction that all this was actually useful and not just terrible type spaghetti. We will now build a small format-like data type equipped with a `printf`-like function.
 
-What is, fundamentally, a format ?
-It can be composed of:
+What is, fundamentally, a format ? It can be composed of:
+
 - Constants that are present in the format.
 - Holes which we will fill during `printf`.
 - The end of a format.
 
 Our goal is to track in the type a list of all the holes. For example, what is the type of `"%s | %s"` ? `"%s"` is a hole and `"|"` is a constant.
 
-{% highlight ocaml %}
+```ocaml
 # ("%s | %s" : _ format) ;;
 - : (string -> string -> 'a, 'b, 'a) format
-{% endhighlight %}
+```
 
 This is very similar to our diff list, where we list the holes in the type. Here is a way to define such type:
 
-{% highlight ocaml %}
+```ocaml
 type ('ty,'v) t =
   | End : ('v,'v) t
   | Constant : string * ('ty,'v) t -> ('ty,'v) t
   | Hole : ('ty, 'v) t -> (string -> 'ty, 'v) t ;;
-{% endhighlight %}
+```
 
 There are two things of note here:
+
 - `Constant` doesn't change the list, since it doesn't define a hole.
 - `Hole` doesn't have any content, it only adds to the type. It can only be filled by a string.
 
-{% highlight ocaml %}
+```ocaml
 # let myfmt = Hole (Constant (" | ", Hole End)) ;;
 val myfmt : (string -> string -> 'v, 'v) format
-{% endhighlight %}
+```
 
 This is the type we wanted! Now that we have a format type, we need to build up a `printf` function. What should be the type of `printf myfmt`? It has two holes to fill by strings and it should return a string, so the type should be `string -> string -> string`. Since the type of `myfmt` is `(string -> string -> 'v,`v) t`, we can use unification again.
 
 We would have the following type:
-{% highlight ocaml %}
+
+```ocaml
 val printf : ('ty, string) t -> 'ty
-{% endhighlight %}
+```
 
 Let's check that it works, if we give `myfmt` to `printf`, `'ty` unifies with `string -> string -> 'v`, `'v` unifies with `string`, so `printf myfmt` is of type `string -> string -> tring`. Fabulous.
 
 In order to implement `printf`, we first need to implement the version by continuation which takes as argument a function consuming the resulting string. `kfprintf f myfmt ...` is morally equivalent to `f (printf myfmt ...)`. However, since we can't manipulate a variable number of arguments in OCaml, we can't write the dots `...`. The solution is to always place the variable number of arguments at the end and to use continuations.
 
-{% highlight ocaml %}
+```ocaml
 val kprintf : (string -> 'v) -> ('ty, 'v) format -> 'ty
-{% endhighlight %}
+```
 
 Given this function, the implementation of `printf` is very simple:
 
-{% highlight ocaml %}
+```ocaml
 let printf fmt = kprintf (fun x -> x) fmt
-{% endhighlight %}
+```
 
 The implementation of `kprintf` is a bit more involved. We have to fold through the format and return a closure consuming all the holes argument. Here is the complete definition.
 
-{% highlight ocaml %}
+```ocaml
 let rec kprintf
   : type ty v. (string -> v) -> (ty,v) t -> ty
   = fun k -> function
@@ -213,7 +220,7 @@ let rec kprintf
     | Hole fmt ->
       let f s = kprintf (fun str -> k @@ s ^ str) fmt
       in f
-{% endhighlight %}
+```
 
 And that's it! The complete code for miniformat is available in [this gist][miniformat] or in [this toplevel][miniformat.js].
 
@@ -229,11 +236,11 @@ People that are very familiar with type tricks might have noticed that something
 
 In practice, we can't use our lists in a functional manner when using append. Here is an example using the lists defined at the beginning:
 
-{% highlight ocaml %}
+```ocaml
 let l = append l1 l2
 let l' = append l l1
 let l'' = append l l2 (* This creates a type error. *)
-{% endhighlight %}
+```
 
 This is a severe restriction to the usability of difference lists. `Format` is equally affected, but the issue is less striking due to the custom format syntax available in OCaml. We can hope this restriction is lifted one day, maybe with a notion of pure functions?
 
@@ -264,10 +271,10 @@ This is very similar to our "miniformat" example, except more complicated. `Stri
 
 Note the very scary `CamlinternalFormatBasics`, showing that you should probably not use that in your programs.
 
-{% highlight ocaml %}
+```ocaml
 # Format.printf myformat "foo" "bar" ;;
 foo | bar
-{% endhighlight %}
+```
 
 ## A more convenient syntax for diff lists
 
