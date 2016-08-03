@@ -276,6 +276,8 @@ Note the very scary `CamlinternalFormatBasics`, showing that you should probably
 foo | bar
 ```
 
+To know more about format, and in particular the many parameters of format6, you can read [Gabriel Scherer's blog post](http://gallium.inria.fr/blog/format6/).
+
 ## A more convenient syntax for diff lists
 
 With OCaml 4.03.0, we can rebind `[]` and `::`, making this much better!
