@@ -207,7 +207,7 @@ The implementation of `kprintf` is a bit more involved. We have to fold through 
 
 {% highlight ocaml %}
 let rec kprintf
-  : type ty res. (string -> res) -> (ty,res) t -> ty
+  : type ty v. (string -> v) -> (ty,v) t -> ty
   = fun k -> function
     | End -> k ""
     | Constant (const, fmt) ->
@@ -230,7 +230,7 @@ People that are very familiar with type tricks might have noticed that something
 [GADTvariance]: http://arxiv.org/abs/1301.2903
 [RWOvalrestr]: https://realworldocaml.org/v1/en/html/imperative-programming-1.html#the-value-restriction
 
-In practice, we can't use our lists in a functional manner when using append. Using the difference list defined at the beginning:
+In practice, we can't use our lists in a functional manner when using append. Here is an example using the lists defined at the beginning:
 
 {% highlight ocaml %}
 let l = append l1 l2
@@ -242,9 +242,9 @@ This is a severe restriction to the usability of difference lists. `Format` is e
 
 # Conclusion
 
-We have learned how to (ab)use the type system to create heterogeneous lists that count the number of their elements, and how to use it to create a toy implementation of format. As the other Camlien Gabriel would put it, We know have to learn how not to use this.
+We have learned how to (ab)use the type system to create heterogeneous lists that count the number of their elements, and how to use it to create a toy implementation of format. As the other Camlien Gabriel would put it, We now have to learn how not to use this.
 
-Fortunately, code that manipulate difference lists is quite annoying to write, offering a natural deterrent to apprentice type magicians. In the case this could actually be useful (such as my own unreleased [Furl][] library), I would encourage to hide the datatypes and provide combinators, as long as examples and documentations. This is a case where the type really do not help understand the API.
+Fortunately, code that manipulate difference lists is quite annoying to write, offering a natural deterrent to apprentice type magicians. In the case this could actually be useful (such as my own unreleased [Furl][] library), I would encourage to hide the datatypes and provide combinators, as long as examples and documentations. This is a case where types really do not help understand the API.
 
 [Furl]: https://github.com/drup/furl
 
@@ -254,14 +254,14 @@ Fortunately, code that manipulate difference lists is quite annoying to write, o
 
 Yes, it is, since the awesome work by Benoit Vaugon in OCaml 4.02. As a proof, let's build the format by hand, without using the fancy syntax.
 
-{% highlight ocaml %}
+```ocaml
 let myformat = CamlinternalFormatBasics.(
   Format
    (String (No_padding,
      String_literal (" | ",
        String (No_padding, End_of_format)))
    ,"%s | %s"))
-{% endhighlight %}
+```
 
 This is very similar to our "miniformat" example, except more complicated[^2]. `String_literal` is `Constant` and `String` is `Hole`. It gives us the type `(string -> string -> 'a, 'b, 'a) format`, which is also what we would expect.
 
@@ -278,7 +278,7 @@ foo | bar
 
 With the last version of OCaml, we can rebind `[]` and `::`, making this much better!
 
-{% highlight ocaml %}
+```ocaml
 module M = struct
 
   type ('ty,'v) t =
@@ -292,7 +292,7 @@ module M = struct
     : type a b c.
       (a, b) t ->
       (b, c) t ->
-      (a,    c) t
+      (a, c) t
     = fun l1 l2 -> match l1 with
       | [] -> l2
       | h :: t -> h :: append t l2
@@ -301,6 +301,6 @@ end
 let l1 = M.[ 1 ; "bla" ]
 let l2 = M.[ () ; 2. ]
 let l3 = M.[ 1 ; "bla" ; () ; 2. ]
-{% endhighlight %}
+```
 
 Isn't that fabulous? :)
