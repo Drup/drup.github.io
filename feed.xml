@@ -10,15 +10,16 @@ layout: null
     <link>{{ site.baseurl | prepend: site.url }}/</link>
     <description>{{ site.description | xml_escape }}</description>
     <pubDate>{{ site.time | date_to_rfc822 }}</pubDate>
-    {% for post in site.posts limit:15 %}
+    {% assign posts = site.posts | where: 'hide', null %}
+    {% for post in posts %}
       {% include page-url-resolver.html page=post %}
       <item>
-        <title>{{ post.title | append: ' | ' | append: site.title | xml_escape }}</title>
+        <title>{{ post.title | xml_escape }} | {{ site.title | xml_escape }}</title>
         {% if post.eye_catch %}
         <image>
           <url>{{ post.eye_catch }}</url>
           <title>{{ post.title }}</title>
-          <link>{{ site.url }}</link>
+          <link>{{ url }}</link>
         </image>
         {% endif %}
         <link>{{ url }}</link>

@@ -2,6 +2,8 @@
 layout: page
 title: About
 permalink: /about/
+order: 1
+share: false
 ---
 
 Hi, I'm Gabriel /Drup/[^1] Radanne, I'm a phd student at University Paris Diderot, under the supervision of [Roberto Di Cosmo](http://dicosmo.org/) and [Jérôme Vouillon](http://www.pps.univ-paris-diderot.fr/~vouillon/).

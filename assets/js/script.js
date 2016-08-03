@@ -17,22 +17,18 @@ $(function () {
         }
     });
 
-    // center all images.
-    $("article img:not(.emoji)").closest("p").css("text-align", "center");
+    // center and linkable all images.
+    var $images = $("article img:not(.emoji, .eye-catch)");
+    $images.closest("p").css("text-align", "center");
+    $images.each(function () {
+        var imgUrl = $(this).attr("src");
+        var $a = $("<a>").attr("href", imgUrl).attr("target", "_blank");
+        $(this).wrap($a);
+    });
 
     // stick aside.
     var topSpacing = $(".site-aside").css("padding-top").replace(/px/, "");
     $(".site-aside .sticky").sticky({
         topSpacing: parseInt(topSpacing)
-    });
-
-    // social buttons.
-    $(".share-buttons").each(function () {
-        $(this).easySocialButtons({
-            url: $(this).data("url"),
-            pageTitle: $(this).data("title"),
-            orders: ["twitter", "hatebu", "facebook", "googleplus"],
-            waitCounter: '<span>Wait...</span>'
-        });
     });
 });
