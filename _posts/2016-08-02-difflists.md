@@ -194,7 +194,7 @@ We would have the following type:
 val printf : ('ty, string) t -> 'ty
 ```
 
-Let's check that it works, if we give `myfmt` to `printf`, `'ty` unifies with `string -> string -> 'v`, `'v` unifies with `string`, so `printf myfmt` is of type `string -> string -> tring`. Fabulous.
+Let's check that it works, if we give `myfmt` to `printf`, `'ty` unifies with `string -> string -> 'v`, `'v` unifies with `string`, so `printf myfmt` is of type `string -> string -> string`. Fabulous.
 
 In order to implement `printf`, we first need to implement the version by continuation which takes as argument a function consuming the resulting string. `kfprintf f myfmt ...` is morally equivalent to `f (printf myfmt ...)`. However, since we can't manipulate a variable number of arguments in OCaml, we can't write the dots `...`. The solution is to always place the variable number of arguments at the end and to use continuations.
 
@@ -229,7 +229,7 @@ And that's it! The complete code for miniformat is available in [this gist][mini
 
 # Because we can never have nice things
 
-People that are very familiar with type tricks might have noticed that something is fishy. The issue here is that our type is not covariant in any of it's type variables. There are various reasons for that, but mostly, [mixing subtyping and GADT is tricky][GADTvariance]. This means we don't benefit from the [relaxed value restriction][RWOvalrestr].
+People that are very familiar with type tricks might have noticed that something is fishy. The issue here is that our type is not covariant in any of its type variables. There are various reasons for that, but mostly, [mixing subtyping and GADT is tricky][GADTvariance]. This means we don't benefit from the [relaxed value restriction][RWOvalrestr].
 
 [GADTvariance]: http://arxiv.org/abs/1301.2903
 [RWOvalrestr]: https://realworldocaml.org/v1/en/html/imperative-programming-1.html#the-value-restriction
