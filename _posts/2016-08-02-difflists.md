@@ -308,3 +308,7 @@ let l3 = M.[ 1 ; "bla" ; () ; 2. ]
 ```
 
 Isn't that fabulous? :)
+
+------
+
+Please discuss this on [reddit](https://reddit.com/r/ocaml/comments/4x2rcn/typing_tricks_diff_lists/).
