@@ -71,7 +71,7 @@ Unification is available at the value level in prolog, but it's also available f
 - : int list -> int list = <fun>
 ```
 
-During type checking, the type checker unifies the unification variable `'a` with `int` (as specified by the [Hidley-milner][HM] family of type systems). We will now use this to do simple computations.
+During type checking, the type checker unifies the unification variable `'a` with `int` (as specified by the [Hindley-Milner][HM] family of type systems). We will now use this to do simple computations.
 
 [HM]: https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system
 
@@ -186,7 +186,7 @@ There are two things of note here:
 val myfmt : (string -> string -> 'v, 'v) format
 ```
 
-This is the type we wanted! Now that we have a format type, we need to build up a `printf` function. What should be the type of `printf myfmt`? It has two holes to fill by strings and it should return a string, so the type should be `string -> string -> string`. Since the type of `myfmt` is `(string -> string -> 'v,`v) t`, we can use unification again.
+This is the type we wanted! Now that we have a format type, we need to build up a `printf` function. What should be the type of `printf myfmt`? It has two holes to fill by strings and it should return a string, so the type should be `string -> string -> string`. Since the type of `myfmt` is `(string -> string -> 'v,'v) t`, we can use unification again.
 
 We would have the following type:
 
