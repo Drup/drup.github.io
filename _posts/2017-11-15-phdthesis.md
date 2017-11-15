@@ -17,8 +17,10 @@ along with [the thesis](https://www.irif.fr/~gradanne/papers/phdthesis.pdf)
 and [the slides](https://www.irif.fr/~gradanne/papers/talk_phdthesis.pdf). The
 abstract can be found below.
 
-If you have any questions, feel free to ask them by email or on
-[discuss](https://discuss.ocaml.org/t/tierless-web-programming-in-ml/1125).
+If you have any questions, feel free to ask them by email, on
+[discuss](https://discuss.ocaml.org/t/tierless-web-programming-in-ml/1125) or
+on [reddit](https://dd.reddit.com/r/ocaml/comments/7d5uec/tierless_web_programming_in_ml/).
+
 
 ### Abstract
 
