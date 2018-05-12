@@ -6,6 +6,7 @@ lsi: false
 title: "Drup's thingies"
 baseurl: ""
 url: https://drup.github.io
+repository: Drup/drup.github.io
 
 avatar: /assets/img/ogp.png
 favicon: /assets/img/ogp.png
@@ -53,7 +54,8 @@ paginate_path: page/:num
 #
 # Gems.
 #
-gems:
+plugins:
+  - jekyll-seo-tag
   - jekyll-paginate
   - jemoji
 
