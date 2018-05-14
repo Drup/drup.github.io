@@ -161,6 +161,9 @@ integrate with fuzzing tools such as afl-fuzz to directly select test cases
 that will torture implementations the most. We also would like to extend 
 our technique to implement more operators, such as boundaries/lookaround.
 
+Please make comments on [discuss](https://discuss.ocaml.org/t/regenerate-test-generation-for-regular-expression-engines/1994)
+or [HN](https://news.ycombinator.com/item?id=17064037).
+
 [regenerate]: https://github.com/Drup/regenerate
 [web]: https://drup.github.io/regenerate/
 [regex]: https://en.wikipedia.org/wiki/Regular_expression
