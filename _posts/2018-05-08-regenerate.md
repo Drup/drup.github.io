@@ -77,7 +77,8 @@ An [online version][web] of the tool is also available for you to play around.
 Regenerate's main purpose is testing. Hence it also provides an [OCaml library][lib] to create
 test harnesses easily through [qcheck][] generators. 
 [qcheck][] is an OCaml library for property testing in the style of QuickCheck. 
-An example test harness for the [ocaml-re](https://github.com/ocaml/ocaml-re) library can be found [here](test/re/test_re.ml).
+An example test harness for the [ocaml-re](https://github.com/ocaml/ocaml-re) library can be found
+[here](https://github.com/Drup/regenerate/blob/master/test/re/test_re.ml).
 
 The main part of the test harness, shown below, creates a test generator
 given an alphabet (here `abc`), a data-structure that describe words
